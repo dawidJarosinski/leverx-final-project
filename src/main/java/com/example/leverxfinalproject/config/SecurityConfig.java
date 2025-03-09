@@ -33,6 +33,7 @@ public class SecurityConfig {
                 request.requestMatchers("/api/verify_code").permitAll();
                 request.requestMatchers("/api/register").permitAll();
                 request.requestMatchers("/api/login").permitAll();
+                request.requestMatchers("/api/auth/**").permitAll();
                 request.anyRequest().authenticated();
             })
                 .httpBasic(Customizer.withDefaults())

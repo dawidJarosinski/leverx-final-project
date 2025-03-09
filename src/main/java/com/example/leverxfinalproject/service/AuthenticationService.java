@@ -1,10 +1,7 @@
 package com.example.leverxfinalproject.service;
 
 
-import com.example.leverxfinalproject.dto.LoginRequest;
-import com.example.leverxfinalproject.dto.RegistrationRequest;
-import com.example.leverxfinalproject.dto.UserResponse;
-import com.example.leverxfinalproject.dto.VerifyRegistrationRequest;
+import com.example.leverxfinalproject.dto.*;
 import com.example.leverxfinalproject.enums.Role;
 import com.example.leverxfinalproject.enums.VerificationCodeType;
 import com.example.leverxfinalproject.exception.VerificationException;
@@ -95,7 +92,6 @@ public class AuthenticationService {
                 user.getRole().name());
     }
 
-    @Transactional
     public String login(LoginRequest request) {
         authenticationManager.authenticate(
                 new UsernamePasswordAuthenticationToken(request.email(), request.password()));
@@ -121,7 +117,50 @@ public class AuthenticationService {
         return jwtService.generateToken(user);
     }
 
+    public String forgotPassword(ForgotPasswordRequest request) {
+        if(!userRepository.existsUserByEmail(request.email())) {
+            throw new UsernameNotFoundException("user with this email does not exist");
+        }
+        String code = generateRandomCode();
+        verificationCodeService.save(VerificationCodeType.CHANGE_PASSWORD, request.email(), code);
+        mailSenderService.sendMail(request.email(), "Change Password", "Your Verification code: " + code);
+
+        return "email has been sent";
+    }
+
+    @Transactional
+    public UserResponse resetPassword(ResetPasswordRequest request) {
+        String code = verificationCodeService
+                .get(VerificationCodeType.CHANGE_PASSWORD, request.email())
+                .orElseThrow(() -> new VerificationException("wrong email"));
+        if(!code.equals(request.code())) {
+            throw new VerificationException("wrong code");
+        }
+
+        User user = userRepository
+                .findUserByEmail(request.email())
+                .orElseThrow(() -> new UsernameNotFoundException("wrong email"));
+        user.setPassword(passwordEncoder.encode(request.newPassword()));
+        userRepository.save(user);
+
+        return new UserResponse(
+                user.getFirstName(),
+                user.getLastName(),
+                user.getEmail(),
+                user.getCreatedAt(),
+                user.getRole().name()
+        );
+    }
+
+    public boolean checkCode(String email, String code) {
+        String codeFromRedis = verificationCodeService
+                .get(VerificationCodeType.CHANGE_PASSWORD, email)
+                .orElseThrow(() -> new VerificationException("wrong email"));
+        return code.equals(codeFromRedis);
+    }
+
     private String generateRandomCode() {
         return String.valueOf(new Random().nextInt(900000) + 100000);
     }
+
 }
