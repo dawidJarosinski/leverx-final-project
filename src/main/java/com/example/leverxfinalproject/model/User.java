@@ -1,6 +1,7 @@
 package com.example.leverxfinalproject.model;
 
 
+import com.example.leverxfinalproject.enums.Role;
 import jakarta.persistence.*;
 import lombok.Data;
 import lombok.NoArgsConstructor;
