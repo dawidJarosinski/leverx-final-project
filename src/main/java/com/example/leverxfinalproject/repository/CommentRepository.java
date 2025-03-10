@@ -12,5 +12,5 @@ public interface CommentRepository extends JpaRepository<Comment, Integer> {
     List<Comment> findCommentsByUserAndApproved(User user, boolean approved);
     Optional<Comment> findCommentById(Integer id);
     @Query("SELECT c FROM Comment c WHERE c.approved = false")
-    List<Comment> findCommentsToConfirm();
+    List<Comment> findCommentsToApprove();
 }
