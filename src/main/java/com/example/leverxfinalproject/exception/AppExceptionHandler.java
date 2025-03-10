@@ -28,4 +28,10 @@ public class AppExceptionHandler {
     public String usernameNotFoundExceptionHandler(UsernameNotFoundException ex) {
         return ex.getMessage();
     }
+
+    @ExceptionHandler(IllegalArgumentException.class)
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    public String usernameNotFoundExceptionHandler(IllegalArgumentException ex) {
+        return ex.getMessage();
+    }
 }

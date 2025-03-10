@@ -18,6 +18,9 @@ public class Comment {
     @Column(name = "id")
     private Integer id;
 
+    @Column(name = "author_id")
+    private String authorId;
+
     @Column(name = "message")
     private String message;
 
@@ -33,4 +36,13 @@ public class Comment {
     @ManyToOne
     @JoinColumn(name = "user_id")
     private User user;
+
+    public Comment(String authorId, String message, Integer rating, LocalDateTime createdAt, boolean approved, User user) {
+        this.authorId = authorId;
+        this.message = message;
+        this.rating = rating;
+        this.createdAt = createdAt;
+        this.approved = approved;
+        this.user = user;
+    }
 }

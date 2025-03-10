@@ -34,6 +34,7 @@ public class SecurityConfig {
                 request.requestMatchers("/api/register").permitAll();
                 request.requestMatchers("/api/login").permitAll();
                 request.requestMatchers("/api/auth/**").permitAll();
+                request.requestMatchers("/api/users/{userId}/**").permitAll();
                 request.anyRequest().authenticated();
             })
                 .httpBasic(Customizer.withDefaults())
