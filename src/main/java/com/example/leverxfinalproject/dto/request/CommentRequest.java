@@ -1,4 +1,4 @@
-package com.example.leverxfinalproject.dto;
+package com.example.leverxfinalproject.dto.request;
 
 
 import org.hibernate.validator.constraints.Range;

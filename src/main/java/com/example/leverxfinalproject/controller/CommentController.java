@@ -1,7 +1,8 @@
 package com.example.leverxfinalproject.controller;
 
-import com.example.leverxfinalproject.dto.CommentRequest;
-import com.example.leverxfinalproject.dto.CommentResponse;
+import com.example.leverxfinalproject.dto.request.CommentRequest;
+import com.example.leverxfinalproject.dto.request.CommentWithProfileRequest;
+import com.example.leverxfinalproject.dto.response.CommentResponse;
 import com.example.leverxfinalproject.service.CommentService;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletResponse;
@@ -14,16 +15,16 @@ import java.util.List;
 import java.util.UUID;
 
 @RestController
-@RequestMapping("/api/users")
+@RequestMapping("/api")
 @RequiredArgsConstructor
 public class CommentController {
 
     private final CommentService commentService;
 
-    @PostMapping("/{userId}/comments")
+    @PostMapping("/profiles/{profileId}/comments")
     public ResponseEntity<CommentResponse> save(
             @Valid @RequestBody CommentRequest request,
-            @PathVariable Integer userId,
+            @PathVariable Integer profileId,
             @CookieValue(value = "author_id", required = false) String authorId,
             HttpServletResponse response) {
         if(authorId == null) {
@@ -33,28 +34,43 @@ public class CommentController {
             response.addCookie(cookie);
         }
 
-        return ResponseEntity.ok(commentService.save(request, userId, authorId));
+        return ResponseEntity.ok(commentService.save(request, profileId, authorId));
     }
 
-    @GetMapping("/{userId}/comments")
-    public ResponseEntity<List<CommentResponse>> findAll(@PathVariable Integer userId) {
-        return ResponseEntity.ok(commentService.findAll(userId));
+    @PostMapping("/comments")
+    public ResponseEntity<CommentResponse> saveWithProfile(
+            @Valid @RequestBody CommentWithProfileRequest request,
+            @CookieValue(value = "author_id", required = false) String authorId,
+            HttpServletResponse response) {
+        if(authorId == null) {
+            authorId = UUID.randomUUID().toString();
+            Cookie cookie = new Cookie("author_id", authorId);
+            cookie.setHttpOnly(true);
+            response.addCookie(cookie);
+        }
+
+        return ResponseEntity.ok(commentService.saveWithProfile(request, authorId));
     }
 
-    @GetMapping("/{userId}/comments/{commentId}")
-    public ResponseEntity<CommentResponse> findById(@PathVariable Integer userId, @PathVariable Integer commentId) {
-        return ResponseEntity.ok(commentService.findById(userId, commentId));
+    @GetMapping("/profiles/{profileId}/comments")
+    public ResponseEntity<List<CommentResponse>> findAll(@PathVariable Integer profileId) {
+        return ResponseEntity.ok(commentService.findAll(profileId));
     }
 
-    @PutMapping("/{userId}/comments/{commentId}")
-    public ResponseEntity<CommentResponse> updateComment(
+    @GetMapping("/profiles/{profileId}/comments/{commentId}")
+    public ResponseEntity<CommentResponse> findById(@PathVariable Integer profileId, @PathVariable Integer commentId) {
+        return ResponseEntity.ok(commentService.findById(profileId, commentId));
+    }
+
+    @PutMapping("/profiles/{profileId}/comments/{commentId}")
+    public ResponseEntity<CommentResponse> update(
             @Valid @RequestBody CommentRequest request,
-            @PathVariable Integer userId,
+            @PathVariable Integer profileId,
             @PathVariable Integer commentId,
             @CookieValue(value = "author_id") String authorId) {
-        return ResponseEntity.ok(commentService.update(request, userId, commentId, authorId));
+        return ResponseEntity.ok(commentService.update(request, profileId, commentId, authorId));
     }
-    @DeleteMapping("/{userId}/comments/{commentId}")
+    @DeleteMapping("/profiles/{userId}/comments/{commentId}")
     public void delete(
             @PathVariable Integer userId,
             @PathVariable Integer commentId,

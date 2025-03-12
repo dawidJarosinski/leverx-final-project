@@ -1,7 +1,8 @@
 package com.example.leverxfinalproject.controller;
 
 
-import com.example.leverxfinalproject.dto.*;
+import com.example.leverxfinalproject.dto.request.*;
+import com.example.leverxfinalproject.dto.response.UserResponse;
 import com.example.leverxfinalproject.service.AuthenticationService;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.Email;

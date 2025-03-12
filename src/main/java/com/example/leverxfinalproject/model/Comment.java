@@ -33,16 +33,16 @@ public class Comment {
     @Column(name = "approved")
     private boolean approved;
 
-    @ManyToOne
-    @JoinColumn(name = "user_id")
-    private User user;
+    @ManyToOne(cascade = CascadeType.PERSIST)
+    @JoinColumn(name = "seller_profile_id")
+    private SellerProfile sellerProfile;
 
-    public Comment(String authorId, String message, Integer rating, LocalDateTime createdAt, boolean approved, User user) {
+    public Comment(String authorId, String message, Integer rating, LocalDateTime createdAt, boolean approved, SellerProfile sellerProfile) {
         this.authorId = authorId;
         this.message = message;
         this.rating = rating;
         this.createdAt = createdAt;
         this.approved = approved;
-        this.user = user;
+        this.sellerProfile = sellerProfile;
     }
 }

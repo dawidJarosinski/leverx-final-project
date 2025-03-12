@@ -1,7 +1,8 @@
 package com.example.leverxfinalproject.service;
 
 
-import com.example.leverxfinalproject.dto.*;
+import com.example.leverxfinalproject.dto.request.*;
+import com.example.leverxfinalproject.dto.response.UserResponse;
 import com.example.leverxfinalproject.enums.Role;
 import com.example.leverxfinalproject.enums.VerificationCodeType;
 import com.example.leverxfinalproject.exception.VerificationException;
@@ -42,7 +43,6 @@ public class AuthenticationService {
                 request.email(),
                 LocalDateTime.now(),
                 Role.SELLER,
-                false,
                 false
         );
         userRepository.save(user);
@@ -56,12 +56,7 @@ public class AuthenticationService {
                 "Your Verification code: " + code
         );
 
-        return new UserResponse(
-                user.getFirstName(),
-                user.getLastName(),
-                user.getEmail(),
-                user.getCreatedAt(),
-                user.getRole().name());
+        return UserResponse.from(user);
     }
 
     @Transactional
@@ -84,12 +79,7 @@ public class AuthenticationService {
         userRepository.save(user);
         verificationCodeService.delete(VerificationCodeType.REGISTRATION, user.getEmail());
 
-        return new UserResponse(
-                user.getFirstName(),
-                user.getLastName(),
-                user.getEmail(),
-                user.getCreatedAt(),
-                user.getRole().name());
+        return UserResponse.from(user);
     }
 
     public String login(LoginRequest request) {
@@ -143,13 +133,7 @@ public class AuthenticationService {
         user.setPassword(passwordEncoder.encode(request.newPassword()));
         userRepository.save(user);
 
-        return new UserResponse(
-                user.getFirstName(),
-                user.getLastName(),
-                user.getEmail(),
-                user.getCreatedAt(),
-                user.getRole().name()
-        );
+        return UserResponse.from(user);
     }
 
     public boolean checkCode(String email, String code) {
@@ -158,6 +142,7 @@ public class AuthenticationService {
                 .orElseThrow(() -> new VerificationException("wrong email"));
         return code.equals(codeFromRedis);
     }
+
 
     private String generateRandomCode() {
         return String.valueOf(new Random().nextInt(900000) + 100000);

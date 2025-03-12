@@ -32,4 +32,12 @@ public class GameObject {
     @ManyToOne
     @JoinColumn(name = "user_id")
     private User user;
+
+    public GameObject(String title, String text, LocalDateTime createdAt, LocalDateTime updatedAt, User user) {
+        this.title = title;
+        this.text = text;
+        this.createdAt = createdAt;
+        this.updatedAt = updatedAt;
+        this.user = user;
+    }
 }

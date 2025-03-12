@@ -6,6 +6,7 @@ import com.example.leverxfinalproject.repository.UserRepository;
 import com.example.leverxfinalproject.security.JwtAuthenticationFilter;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
@@ -30,13 +31,16 @@ public class SecurityConfig {
                 .csrf(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests(
             request -> {
-                request.requestMatchers("/api/verify_code").permitAll();
-                request.requestMatchers("/api/register").permitAll();
-                request.requestMatchers("/api/login").permitAll();
-                request.requestMatchers("/api/auth/**").permitAll();
-                request.requestMatchers("/api/users/{userId}/**").permitAll();
-                request.requestMatchers("/api/admin/**").hasRole("ADMIN");
-                request.anyRequest().authenticated();
+                request
+                        .requestMatchers("/api/verify_code").permitAll()
+                        .requestMatchers("/api/register").permitAll()
+                        .requestMatchers("/api/login").permitAll()
+                        .requestMatchers("/api/auth/**").permitAll()
+                        .requestMatchers("/api/profiles/{userId}/**").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/api/objects").permitAll()
+                        .requestMatchers("/api/comments").permitAll()
+                        .requestMatchers("/api/admin/**").hasRole("ADMIN")
+                        .anyRequest().authenticated();
             })
                 .httpBasic(Customizer.withDefaults())
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))

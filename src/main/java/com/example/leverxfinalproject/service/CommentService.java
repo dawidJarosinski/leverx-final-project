@@ -1,13 +1,14 @@
 package com.example.leverxfinalproject.service;
 
-import com.example.leverxfinalproject.dto.CommentRequest;
-import com.example.leverxfinalproject.dto.CommentResponse;
+import com.example.leverxfinalproject.dto.request.CommentRequest;
+import com.example.leverxfinalproject.dto.request.CommentWithProfileRequest;
+import com.example.leverxfinalproject.dto.response.CommentResponse;
 import com.example.leverxfinalproject.model.Comment;
-import com.example.leverxfinalproject.model.User;
+import com.example.leverxfinalproject.model.SellerProfile;
 import com.example.leverxfinalproject.repository.CommentRepository;
-import com.example.leverxfinalproject.repository.UserRepository;
+import com.example.leverxfinalproject.repository.SellerProfileRepository;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -18,14 +19,18 @@ import java.util.List;
 @RequiredArgsConstructor
 public class CommentService {
 
-    private final UserRepository userRepository;
     private final CommentRepository commentRepository;
+    private final SellerProfileRepository sellerProfileRepository;
 
     @Transactional
-    public CommentResponse save(CommentRequest request, Integer userId, String authorId) {
-        User user = userRepository
-                .findUserById(userId)
-                .orElseThrow(() -> new UsernameNotFoundException("wrong user id"));
+    public CommentResponse save(CommentRequest request, Integer profileId, String authorId) {
+        SellerProfile sellerProfile = sellerProfileRepository
+                .findSellerProfileById(profileId)
+                .orElseThrow(() -> new IllegalArgumentException("wrong seller profile id"));
+
+        if(!sellerProfile.isApproved()) {
+            throw new IllegalArgumentException("this seller is not approved");
+        }
 
         Comment comment = new Comment(
                 authorId,
@@ -33,42 +38,58 @@ public class CommentService {
                 request.rating(),
                 LocalDateTime.now(),
                 false,
-                user
+                sellerProfile
         );
         commentRepository.save(comment);
 
-        return mapCommentToCommentResponse(comment);
+        return CommentResponse.from(comment);
     }
 
-    public List<CommentResponse> findAll(Integer userId) {
-        User user = userRepository
-                .findUserById(userId)
-                .orElseThrow(() -> new UsernameNotFoundException("wrong user id"));
+    @Transactional
+    public CommentResponse saveWithProfile(@Valid CommentWithProfileRequest request, String authorId) {
+        SellerProfile sellerProfile = new SellerProfile(request.sellerProfile().name(), null, false);
+        Comment comment = new Comment(
+                authorId,
+                request.message(),
+                request.rating(),
+                LocalDateTime.now(),
+                false,
+                sellerProfile
+        );
+
+        commentRepository.save(comment);
+        return CommentResponse.from(comment);
+    }
+
+    public List<CommentResponse> findAll(Integer profileId) {
+        SellerProfile sellerProfile = sellerProfileRepository
+                .findSellerProfileById(profileId)
+                .orElseThrow(() -> new IllegalArgumentException("wrong seller profile id"));
 
         return commentRepository
-                .findCommentsByUserAndApproved(user, true)
+                .findCommentsBySellerProfileAndApproved(sellerProfile, true)
                 .stream()
-                .map(this::mapCommentToCommentResponse)
+                .map(CommentResponse::from)
                 .toList();
     }
 
-    public CommentResponse findById(Integer userId, Integer commentId) {
-        User user = userRepository
-                .findUserById(userId)
-                .orElseThrow(() -> new UsernameNotFoundException("wrong user id"));
+    public CommentResponse findById(Integer profileId, Integer commentId) {
+        SellerProfile sellerProfile = sellerProfileRepository
+                .findSellerProfileById(profileId)
+                .orElseThrow(() -> new IllegalArgumentException("wrong seller profile id"));
 
         Comment comment = commentRepository
                 .findCommentById(commentId)
                 .orElseThrow(() -> new IllegalArgumentException("wrong comment id"));
-        if(!comment.getUser().getId().equals(user.getId())) {
-            throw new IllegalArgumentException("wrong comment if for this user");
+        if(!comment.getSellerProfile().getId().equals(sellerProfile.getId())) {
+            throw new IllegalArgumentException("wrong comment if for this seller profile");
         }
-        return mapCommentToCommentResponse(comment);
+        return CommentResponse.from(comment);
     }
 
     @Transactional
-    public CommentResponse update(CommentRequest request, Integer userId, Integer commentId, String authorId) {
-        Comment comment = validateCommentOwnershipAndIsApproved(userId, commentId, authorId);
+    public CommentResponse update(CommentRequest request, Integer profileId, Integer commentId, String authorId) {
+        Comment comment = validateCommentOwnershipAndIsApproved(profileId, commentId, authorId);
 
         comment.setApproved(false);
         comment.setRating(request.rating());
@@ -76,17 +97,17 @@ public class CommentService {
 
         commentRepository.save(comment);
 
-        return mapCommentToCommentResponse(comment);
+        return CommentResponse.from(comment);
     }
 
     @Transactional
-    public void delete(Integer userId, Integer commentId, String authorId) {
-        Comment comment = validateCommentOwnershipAndIsApproved(userId, commentId, authorId);
+    public void delete(Integer profileId, Integer commentId, String authorId) {
+        Comment comment = validateCommentOwnershipAndIsApproved(profileId, commentId, authorId);
 
         commentRepository.delete(comment);
     }
 
-    private Comment validateCommentOwnershipAndIsApproved(Integer userId, Integer commentId, String authorId) {
+    private Comment validateCommentOwnershipAndIsApproved(Integer profileId, Integer commentId, String authorId) {
         Comment comment = commentRepository
                 .findCommentById(commentId)
                 .orElseThrow(() -> new IllegalArgumentException("wrong comment id"));
@@ -97,19 +118,9 @@ public class CommentService {
             throw new IllegalArgumentException("you are not the author of the comment");
         }
 
-        if(!comment.getUser().getId().equals(userId)) {
-            throw new IllegalArgumentException("wrong comment id for this user");
+        if(!comment.getSellerProfile().getId().equals(profileId)) {
+            throw new IllegalArgumentException("wrong comment id for this seller profile");
         }
         return comment;
-    }
-
-    private CommentResponse mapCommentToCommentResponse(Comment comment) {
-        return new CommentResponse(
-                comment.getAuthorId(),
-                comment.getRating(),
-                comment.getMessage(),
-                comment.getCreatedAt(),
-                comment.isApproved()
-        );
     }
 }

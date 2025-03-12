@@ -1,7 +1,7 @@
 package com.example.leverxfinalproject.controller;
 
-import com.example.leverxfinalproject.dto.CommentResponse;
-import com.example.leverxfinalproject.dto.UserResponse;
+import com.example.leverxfinalproject.dto.response.CommentResponse;
+import com.example.leverxfinalproject.dto.response.SellerProfileResponse;
 import com.example.leverxfinalproject.service.AdminService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -31,19 +31,19 @@ public class AdminController {
         adminService.declineComment(commentId);
     }
 
-    @GetMapping("/users")
-    public ResponseEntity<List<UserResponse>> findAllUsersToApprove() {
-        return ResponseEntity.ok(adminService.findAllUsersToConfirm());
+    @GetMapping("/profiles")
+    public ResponseEntity<List<SellerProfileResponse>> findAllProfilesToApprove() {
+        return ResponseEntity.ok(adminService.findAllSellerProfilesToApprove());
     }
 
-    @PatchMapping("/users/{userId}/approve")
-    public ResponseEntity<UserResponse> approveUser(@PathVariable Integer userId) {
-        return ResponseEntity.ok(adminService.approveUser(userId));
+    @PatchMapping("/profiles/{profileId}/approve")
+    public ResponseEntity<SellerProfileResponse> approveProfile(@PathVariable Integer profileId) {
+        return ResponseEntity.ok(adminService.approveProfile(profileId));
     }
 
-    @DeleteMapping("/users/{userId}/decline")
-    public void declineUser(@PathVariable Integer userId) {
-        adminService.declineUser(userId);
+    @DeleteMapping("/profiles/{profileId}/decline")
+    public void declineProfile(@PathVariable Integer profileId) {
+        adminService.declineProfile(profileId);
     }
 
 
