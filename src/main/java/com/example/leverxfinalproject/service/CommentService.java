@@ -7,7 +7,6 @@ import com.example.leverxfinalproject.model.Comment;
 import com.example.leverxfinalproject.model.SellerProfile;
 import com.example.leverxfinalproject.repository.CommentRepository;
 import com.example.leverxfinalproject.repository.SellerProfileRepository;
-import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -46,7 +45,7 @@ public class CommentService {
     }
 
     @Transactional
-    public CommentResponse saveWithProfile(@Valid CommentWithProfileRequest request, String authorId) {
+    public CommentResponse saveWithProfile(CommentWithProfileRequest request, String authorId) {
         SellerProfile sellerProfile = new SellerProfile(request.sellerProfile().name(), null, false);
         Comment comment = new Comment(
                 authorId,

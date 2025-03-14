@@ -7,24 +7,27 @@ import com.example.leverxfinalproject.service.SellerProfileService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.security.Principal;
+import java.util.List;
 
 @RestController
-@RequestMapping("/api")
+@RequestMapping("/api/profiles")
 @RequiredArgsConstructor
 public class SellerProfileController {
 
     private final SellerProfileService sellerProfileService;
 
-    @PostMapping("/profiles")
+    @PostMapping()
     public ResponseEntity<SellerProfileResponse> save(
             @Valid @RequestBody SellerProfileRequest request,
             Principal principal) {
         return ResponseEntity.ok(sellerProfileService.save(request, principal.getName()));
+    }
+
+    @GetMapping()
+    public ResponseEntity<List<SellerProfileResponse>> findAllSortedByRatingDescending() {
+        return ResponseEntity.ok(sellerProfileService.findAllSortedByRatingDescending());
     }
 }

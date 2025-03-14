@@ -13,4 +13,6 @@ public interface CommentRepository extends JpaRepository<Comment, Integer> {
     Optional<Comment> findCommentById(Integer id);
     @Query("SELECT c FROM Comment c WHERE c.approved = false")
     List<Comment> findCommentsToApprove();
+    @Query("SELECT COALESCE(AVG(c.rating), 0) FROM Comment c WHERE c.sellerProfile = ?1 AND c.approved = true")
+    Double findAverageRatingBySellerProfile(SellerProfile sellerProfile);
 }
