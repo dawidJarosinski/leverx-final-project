@@ -31,7 +31,7 @@ class SellerProfileServiceTest {
     @Mock
     private UserRepository userRepository;
 
-    SellerProfileService underTest;
+    private SellerProfileService underTest;
 
     @BeforeEach
     void setUp() {

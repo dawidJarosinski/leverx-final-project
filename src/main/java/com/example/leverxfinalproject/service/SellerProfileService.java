@@ -47,6 +47,7 @@ public class SellerProfileService {
         return sellerProfileRepository
                 .findAll()
                 .stream()
+                .filter(SellerProfile::isApproved)
                 .sorted((sellerProfile1, sellerProfile2) -> {
                     return commentRepository.findAverageRatingBySellerProfile(sellerProfile2).intValue()
                             - commentRepository.findAverageRatingBySellerProfile(sellerProfile1).intValue();
