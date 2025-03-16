@@ -118,7 +118,5 @@ class SellerProfileServiceTest {
                 () -> underTest.save(sellerProfileRequest, email),
                 "this user already has seller profile");
         Mockito.verify(sellerProfileRepository, Mockito.never()).save(Mockito.any(SellerProfile.class));
-
-
     }
 }

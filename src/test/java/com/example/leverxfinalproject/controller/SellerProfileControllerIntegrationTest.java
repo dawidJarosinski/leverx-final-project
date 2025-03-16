@@ -1,4 +1,4 @@
-package com.example.leverxfinalproject.service;
+package com.example.leverxfinalproject.controller;
 
 
 import com.example.leverxfinalproject.dto.request.LoginRequest;

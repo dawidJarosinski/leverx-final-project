@@ -1,0 +1,23 @@
+services:
+  postgres:
+    image: postgres:latest
+    container_name: postgres
+    ports:
+      - "5432:5432"
+    environment:
+      POSTGRES_DB: leverxdb
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: password
+  redis:
+    image: redis:latest
+    container_name: redis
+    ports:
+      - "6379:6379"
+  app:
+    image: dawidjarosinski/leverx-final-project:latest
+    container_name: app
+    ports:
+      - "8080:8080"
+    depends_on:
+      - postgres
+
