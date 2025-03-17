@@ -13,6 +13,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
@@ -22,7 +23,7 @@ public class CommentService {
     private final SellerProfileRepository sellerProfileRepository;
 
     @Transactional
-    public CommentResponse save(CommentRequest request, Integer profileId, String authorId) {
+    public CommentResponse save(CommentRequest request, Integer profileId, UUID authorId) {
         SellerProfile sellerProfile = sellerProfileRepository
                 .findSellerProfileById(profileId)
                 .orElseThrow(() -> new IllegalArgumentException("wrong seller profile id"));
@@ -45,7 +46,7 @@ public class CommentService {
     }
 
     @Transactional
-    public CommentResponse saveWithProfile(CommentWithProfileRequest request, String authorId) {
+    public CommentResponse saveWithProfile(CommentWithProfileRequest request, UUID authorId) {
         SellerProfile sellerProfile = new SellerProfile(request.sellerProfile().name(), null, false);
         Comment comment = new Comment(
                 authorId,
@@ -87,7 +88,7 @@ public class CommentService {
     }
 
     @Transactional
-    public CommentResponse update(CommentRequest request, Integer profileId, Integer commentId, String authorId) {
+    public CommentResponse update(CommentRequest request, Integer profileId, Integer commentId, UUID authorId) {
         Comment comment = validateCommentOwnershipAndIsApproved(profileId, commentId, authorId);
 
         comment.setApproved(false);
@@ -100,13 +101,13 @@ public class CommentService {
     }
 
     @Transactional
-    public void delete(Integer profileId, Integer commentId, String authorId) {
+    public void delete(Integer profileId, Integer commentId, UUID authorId) {
         Comment comment = validateCommentOwnershipAndIsApproved(profileId, commentId, authorId);
 
         commentRepository.delete(comment);
     }
 
-    private Comment validateCommentOwnershipAndIsApproved(Integer profileId, Integer commentId, String authorId) {
+    private Comment validateCommentOwnershipAndIsApproved(Integer profileId, Integer commentId, UUID authorId) {
         Comment comment = commentRepository
                 .findCommentById(commentId)
                 .orElseThrow(() -> new IllegalArgumentException("wrong comment id"));

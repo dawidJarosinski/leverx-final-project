@@ -15,7 +15,7 @@ public record CommentResponse(
     public static CommentResponse from(Comment comment) {
         return new CommentResponse(
                 comment.getId(),
-                comment.getAuthorId(),
+                comment.getAuthorId().toString(),
                 comment.getRating(),
                 comment.getMessage(),
                 comment.getCreatedAt(),

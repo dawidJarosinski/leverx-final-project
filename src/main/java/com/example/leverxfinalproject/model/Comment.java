@@ -6,6 +6,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.time.LocalDateTime;
+import java.util.UUID;
 
 @Table(name = "comments")
 @Entity
@@ -19,7 +20,7 @@ public class Comment {
     private Integer id;
 
     @Column(name = "author_id")
-    private String authorId;
+    private UUID authorId;
 
     @Column(name = "message")
     private String message;
@@ -37,7 +38,7 @@ public class Comment {
     @JoinColumn(name = "seller_profile_id")
     private SellerProfile sellerProfile;
 
-    public Comment(String authorId, String message, Integer rating, LocalDateTime createdAt, boolean approved, SellerProfile sellerProfile) {
+    public Comment(UUID authorId, String message, Integer rating, LocalDateTime createdAt, boolean approved, SellerProfile sellerProfile) {
         this.authorId = authorId;
         this.message = message;
         this.rating = rating;

@@ -25,11 +25,11 @@ public class CommentController {
     public ResponseEntity<CommentResponse> save(
             @Valid @RequestBody CommentRequest request,
             @PathVariable Integer profileId,
-            @CookieValue(value = "author_id", required = false) String authorId,
+            @CookieValue(value = "author_id", required = false) UUID authorId,
             HttpServletResponse response) {
         if(authorId == null) {
-            authorId = UUID.randomUUID().toString();
-            Cookie cookie = new Cookie("author_id", authorId);
+            authorId = UUID.randomUUID();
+            Cookie cookie = new Cookie("author_id", authorId.toString());
             cookie.setHttpOnly(true);
             response.addCookie(cookie);
         }
@@ -40,11 +40,11 @@ public class CommentController {
     @PostMapping("/comments")
     public ResponseEntity<CommentResponse> saveWithProfile(
             @Valid @RequestBody CommentWithProfileRequest request,
-            @CookieValue(value = "author_id", required = false) String authorId,
+            @CookieValue(value = "author_id", required = false) UUID authorId,
             HttpServletResponse response) {
         if(authorId == null) {
-            authorId = UUID.randomUUID().toString();
-            Cookie cookie = new Cookie("author_id", authorId);
+            authorId = UUID.randomUUID();
+            Cookie cookie = new Cookie("author_id", authorId.toString());
             cookie.setHttpOnly(true);
             response.addCookie(cookie);
         }
@@ -67,14 +67,14 @@ public class CommentController {
             @Valid @RequestBody CommentRequest request,
             @PathVariable Integer profileId,
             @PathVariable Integer commentId,
-            @CookieValue(value = "author_id") String authorId) {
+            @CookieValue(value = "author_id") UUID authorId) {
         return ResponseEntity.ok(commentService.update(request, profileId, commentId, authorId));
     }
     @DeleteMapping("/profiles/{userId}/comments/{commentId}")
     public void delete(
             @PathVariable Integer userId,
             @PathVariable Integer commentId,
-            @CookieValue(value = "author_id") String authorId) {
+            @CookieValue(value = "author_id") UUID authorId) {
 
         commentService.delete(userId, commentId, authorId);
     }
