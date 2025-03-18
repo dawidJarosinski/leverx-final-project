@@ -18,6 +18,7 @@ spring.data.redis.port=6379
 spring.datasource.url=jdbc:postgresql://postgres:5432/leverxdb
 spring.datasource.username=postgres
 spring.datasource.password=<TO_BE_FILLED>
+spring.jpa.database-platform=org.hibernate.dialect.PostgreSQLDialect
 
 spring.jpa.hibernate.ddl-auto=create-drop
 spring.jpa.show-sql=true
@@ -42,6 +43,7 @@ To run tests, fill in the `application.properties` file in `test/resources` with
 spring.datasource.url=jdbc:postgresql://postgres:5432/testdb
 spring.datasource.username=postgres
 spring.datasource.password=password
+spring.jpa.database-platform=org.hibernate.dialect.PostgreSQLDialect
 
 spring.jpa.hibernate.ddl-auto=create-drop
 spring.jpa.show-sql=true
